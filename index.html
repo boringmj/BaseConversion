@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进制转换</title>
+</head>
+<body>
+    将<select id="input_get_s">
+        <option value ="B">二进制(B)</option>
+        <option value ="O">八进制(O,Q)</option>
+        <option value="D">十进制(D)</option>
+        <option value="H">十六进制(H)</option>
+    </select>
+    的<input id="input_get_number">
+    转换为<select id="input_get_e">
+        <!-- <option value ="B">二进制(B)</option>
+        <option value ="O">八进制(O,Q)</option> -->
+        <option value="D">十进制(D)</option>
+        <!-- <option value="H">十六进制(H)</option> -->
+    </select>并写出过程<br>
+    为防止死循环,小数部分程序最多计算<input id="input_get_count" type="number" value="100">次
+    <button id="btn">转换</button><br>
+    转换结果<button id="cls">清空</button><br>
+    <span id="put"></span>
+    <br><hr><span>注意事项:<br>1.本程序暂不支持保留至精确位小数(未来计划的是算出的小数满足位数后程序终止)<br>2.本程序暂不对输入数据进行检查,如果输入数据都是不合法的那结果必然是错误的<br>3.小数部分最多计算次数不等同于最终保留位数<br>4.本来就是写着玩的,浪费的都是客户端的资源,所以暂时不打算优化,也没版权这种说法</span>
+    <script>
+        //注意: 本程序是模拟的教材上的方法进行转换并展示过程,仅用于学习和验证
+        var data={
+            'base':[['B',2],['O',8],['D',10],['H',16]],
+            'number':[["0",0],["1",1],["2",2],["3",3],["4",4],["5",5],["6",6],["7",7],["8",8],["9",9],['A',10],['B',11],['C',12],['D',13],['E',14],['F',15]]
+        }
+        //监听按钮被点击
+        document.getElementById("cls").onclick=function(){
+            document.getElementById("put").innerHTML="";
+        }
+        document.getElementById("btn").onclick=function(){
+            var input_get_s=document.getElementById("input_get_s").value;
+            var input_get_e=document.getElementById("input_get_e").value;
+            var input_get_number=document.getElementById("input_get_number").value.toUpperCase();
+            var input_get_count=document.getElementById("input_get_count").value;
+            var input_get_s_base=2;
+            var input_get_e_base=2;
+            document.getElementById("put").innerHTML+="<br><hr>开始运算";
+            for(i in data.base)
+            {
+                if(data.base[i][0]==input_get_s)
+                    input_get_s_base=data.base[i][1];
+                if(data.base[i][0]==input_get_e)
+                    input_get_e_base=data.base[i][1];
+            }
+            //分割整数和小数部分
+            input_get_number_array=input_get_number.split(".");
+            if(input_get_number_array.length<2)
+                input_get_number_array[1]="0";
+            //任意进制换位为十进制
+            if(input_get_e=="D")
+            {
+                int_number_array=input_get_number_array[0].split("");
+                floot_number_array=input_get_number_array[1].split("");
+                //整数部分
+                int_number=0;
+                for(i in int_number_array)
+                {
+                    for(j in data.number)
+                    {
+                        if(data.number[j][0]==int_number_array[i])
+                        {
+                            temp_int=data.number[j][1]*Math.pow(input_get_s_base,int_number_array.length-i-1);
+                            document.getElementById("put").innerHTML+="<br>"+int_number+"+"+data.number[j][1]+"x"+input_get_s_base+"<sup>"+(int_number_array.length-i-1)+"</sup>="+(int_number+temp_int)+" (S:"+int_number+",E:"+temp_int+",R:"+(int_number+temp_int)+",B:0)";
+                            int_number+=temp_int;
+                        }
+                    }
+                }
+                //小数部分
+                floot_number_count=0;
+                for(i in floot_number_array)
+                {
+                    for(j in data.number)
+                    {
+                        if(data.number[j][0]==floot_number_array[i])
+                        {
+                            temp_int=data.number[j][1]*Math.pow(input_get_s_base,-1-i);
+                            document.getElementById("put").innerHTML+="<br>"+int_number+"+"+data.number[j][1]+"x"+input_get_s_base+"<sup>"+(-1-i)+"</sup>="+(int_number+temp_int)+" (S:"+int_number+",E:"+temp_int+",R:"+(int_number+temp_int)+",B:1)";
+                            int_number+=temp_int;
+                        }
+                    }
+                    floot_number_count++;
+                    if(floot_number_count>=Number(input_get_count))
+                        break;
+                }
+                document.getElementById("put").innerHTML+="<br>最终结果为:"+int_number;
+            }
+        }
+    </script>
+</body>
+</html>
